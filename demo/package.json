@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6"
   },
   "devDependencies": {
     "@innovixx/eslint-config": "^1.3.2",

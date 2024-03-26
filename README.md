@@ -1,26 +1,26 @@
-[![NPM](https://img.shields.io/npm/v/@invx-ui/boilerplate)](https://www.npmjs.com/@invx-ui/boilerplate)
-![Bundle Size](https://img.shields.io/bundlephobia/minzip/@invx-ui/boilerplate?label=zipped)
+[![NPM](https://img.shields.io/npm/v/@invx-ui/position-anchor)](https://www.npmjs.com/@invx-ui/position-anchor)
+![Bundle Size](https://img.shields.io/bundlephobia/minzip/@invx-ui/position-anchor?label=zipped)
 
-# React Boilerplate
+# React Position Anchor
 
-Read the full documentation [here](https://invx-ui.com/docs/boilerplate).
+Read the full documentation [here](https://invx-ui.com/docs/position-anchor).
 
 ### Installation
 
 ```bash
-$ npm i @invx-ui/boilerplate
+$ npm i @invx-ui/position-anchor
 $ # or
-$ yarn add @invx-ui/boilerplate
+$ yarn add @invx-ui/position-anchor
 $ # or
-$ pnpm add @invx-ui/boilerplate
+$ pnpm add @invx-ui/position-anchor
 ```
 
 ## Development
 
-To develop this module locally, spin up the [demo app](./demo/App.demo.js):
+To develop this module locally, spin up the [demo app](./demo):
 
 ```bash
-$ git clone git@github.com:invx-ui/boilerplate.git
+$ git clone git@github.com:invx-ui/position-anchor.git
 $ pnpm
 $ pnpm dev
 $ open http://localhost:3000
@@ -28,4 +28,4 @@ $ open http://localhost:3000
 
 ## License
 
-[MIT](https://github.com/invx-ui/boilerplate/blob/master/LICENSE) Copyright (c) Invx UI
+[MIT](https://github.com/invx-ui/position-anchor/blob/master/LICENSE) Copyright (c) Invx UI

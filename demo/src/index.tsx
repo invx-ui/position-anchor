@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Anchor, Position, Popup } from '@invx-ui/boilerplate'
+import { Anchor, Position, Popup, PositionAnchor } from '@invx-ui/boilerplate'
 import Draggable from 'react-draggable';
 
 const PositionExample: React.FC = () => {
@@ -23,12 +23,13 @@ const PositionExample: React.FC = () => {
       onDrag={onControlledDragStop}
     >
       <div>
-        <Position
+        <PositionAnchor
           placement='top'
         >
           {
             ({
               checkCollisions,
+
             }) => {
               checkCollisionsRef.current = checkCollisions;
               return (
@@ -55,7 +56,7 @@ const PositionExample: React.FC = () => {
               )
             }
           }
-        </Position>
+        </PositionAnchor>
       </div>
     </Draggable>
   )

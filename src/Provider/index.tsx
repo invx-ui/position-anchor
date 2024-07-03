@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { HTMLProps, useEffect, useId, useRef, useState } from 'react';
 import { PositionContext } from './context/index.js';
 import { debounce } from '../utils/debounce/index.js';
 
@@ -16,7 +16,7 @@ export type PositionSettings = {
   placement: Position;
 };
 
-export type PositionProviderProps = PositionSettings & {
+export type PositionProviderProps = PositionSettings & HTMLProps<HTMLDivElement> & {
   children: React.ReactNode | ChildFunction;
 };
 
@@ -25,6 +25,7 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
   classPrefix,
   id: idFromProps,
   placement: placementFromProps,
+  ...rest
 }) => {
   const [placement, setPlacement] = useState<Position>(placementFromProps);
   const [popupStyles, setPopupStyles] = useState<
@@ -191,6 +192,7 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
         style={{
           position: 'relative',
         }}
+        {...rest}
       >
         {typeof children === 'function' ? children(context) : children}
       </div>

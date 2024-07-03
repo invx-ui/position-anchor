@@ -33,7 +33,6 @@ export const Anchor: React.FC<AnchorProps> = (props) => {
       ref={setAnchorRef}
       id={`position-anchor_${idFromContext}`}
       aria-labelledby={`position-anchor_${idFromContext}`}
-      role="region"
       {...rest}
       className={mergedClasses}
     >

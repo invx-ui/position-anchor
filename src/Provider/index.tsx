@@ -14,6 +14,7 @@ export type PositionSettings = {
   classPrefix?: string;
   id?: string;
   placement: Position;
+  position?: 'fixed' | 'relative';
 };
 
 export type PositionProviderProps = PositionSettings & HTMLProps<HTMLDivElement> & {
@@ -25,6 +26,7 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
   classPrefix,
   id: idFromProps,
   placement: placementFromProps,
+  position = 'relative',
   ...rest
 }) => {
   const [placement, setPlacement] = useState<Position>(placementFromProps);
@@ -190,7 +192,7 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
     <PositionContext.Provider value={context}>
       <div
         style={{
-          position: 'relative',
+          position,
         }}
         {...rest}
       >

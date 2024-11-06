@@ -22,40 +22,43 @@ const PositionExample: React.FC = () => {
       position={position}
       onDrag={onControlledDragStop}
     >
-      <div>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+      }}>
         <PositionAnchor
-          placement='top'
+          placement='bottom'
+          position='fixed'
         >
-          {
-            ({
-              checkCollisions,
-
-            }) => {
-              checkCollisionsRef.current = checkCollisions;
-              return (
-                <>
-                  <Anchor>
-                    <div style={{
-                      width: '200px',
-                      height: '20px',
-                    }}>
-                      Click Me
-                    </div>
-                  </Anchor>
-                  <Popup>
-                    <div style={{
-                      width: '100px',
-                      height: '100px',
-                      backgroundColor: 'white',
-                      border: '1px solid black',
-                    }}>
-                      Hover Me
-                    </div>
-                  </Popup>
-                </>
-              )
-            }
-          }
+          {/* @ts-expect-error */}
+          {({ checkCollisions }) => {
+            checkCollisionsRef.current = checkCollisions;
+            return (
+              <>
+                <Anchor>
+                  <div style={{
+                    width: '200px',
+                    height: '20px',
+                  }}>
+                    Drag Me
+                  </div>
+                </Anchor>
+                <Popup>
+                  <div style={{
+                    width: '100px',
+                    height: '100px',
+                    backgroundColor: 'white',
+                    border: '1px solid black',
+                  }}>
+                    Hover Me
+                  </div>
+                </Popup>
+              </>
+            );
+          }}
         </PositionAnchor>
       </div>
     </Draggable>
@@ -68,7 +71,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '100%',
+      height: '100vh',
     }}><PositionExample /></div>
   </React.StrictMode>,
 );

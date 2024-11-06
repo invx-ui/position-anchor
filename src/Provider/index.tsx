@@ -1,4 +1,4 @@
-import React, { HTMLProps, useEffect, useId, useRef, useState } from 'react';
+import React, { HTMLProps, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { PositionContext } from './context/index.js';
 import { debounce } from '../utils/debounce/index.js';
 
@@ -44,7 +44,6 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
   const id = idFromProps || uniqueId;
   const prefixToUse = classPrefix;
   const rootClass = prefixToUse ? `${prefixToUse}__${positionBaseClass}` : `invx-${positionBaseClass}`;
-
 
   const updatePopupPosition = (currentPlacement: Position) => {
     if (anchorRef?.current && popupRef?.current) {
@@ -205,12 +204,30 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
     debounce(() => checkCollisions(), rateLimit),
   ).current;
 
+  const addScrollListeners = useCallback(() => {
+    let parent = anchorRef.current?.parentElement;
+    while (parent) {
+      parent.addEventListener('scroll', debouncedCheckCollisions);
+      parent = parent.parentElement;
+    }
+  }, [debouncedCheckCollisions]);
+
+  const removeScrollListeners = useCallback(() => {
+    let parent = anchorRef.current?.parentElement;
+    while (parent) {
+      parent.removeEventListener('scroll', debouncedCheckCollisions);
+      parent = parent.parentElement;
+    }
+  }, [debouncedCheckCollisions]);
+
   useEffect(() => {
     window.addEventListener('resize', debouncedCheckCollisions);
+    addScrollListeners();
     return () => {
       window.removeEventListener('resize', debouncedCheckCollisions);
+      removeScrollListeners();
     };
-  }, [debouncedCheckCollisions]);
+  }, [debouncedCheckCollisions, addScrollListeners, removeScrollListeners]);
 
   useEffect(() => {
     debouncedUpdatePopupPosition(placement);

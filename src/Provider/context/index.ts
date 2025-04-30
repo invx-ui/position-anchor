@@ -6,9 +6,9 @@ export interface PositionContext extends Omit<PositionProviderProps, 'children'>
   id: string
   placement: Position
   popupStyles: {
-    left: number | string;
+    left?: number | string;
     position: string;
-    top: number | string;
+    top?: number | string;
   }
   setAnchorRef: React.MutableRefObject<HTMLElement | undefined>
   setPopupRef: React.MutableRefObject<HTMLElement | undefined>

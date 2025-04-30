@@ -1,6 +1,5 @@
-import React, { HTMLProps, useEffect, useId, useRef, useState } from 'react';
+import React, { HTMLProps, useId, useRef, useState, useEffect } from 'react';
 import { PositionContext } from './context/index.js';
-import { debounce } from '../utils/debounce/index.js';
 
 export const positionBaseClass = 'position';
 
@@ -14,7 +13,8 @@ export type PositionSettings = {
   classPrefix?: string;
   id?: string;
   placement: Position;
-  position?: 'fixed' | 'absolute';
+  position?: 'fixed' | 'relative';
+  containerElementId?: string;
 };
 
 export type PositionProviderProps = PositionSettings & HTMLProps<HTMLDivElement> & {
@@ -25,18 +25,18 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
   children,
   classPrefix,
   id: idFromProps,
-  placement: placementFromProps,
-  position = 'absolute',
+  placement,
+  position = 'relative',
   ...rest
 }) => {
-  const [placement, setPlacement] = useState<Position>(placementFromProps);
   const [popupStyles, setPopupStyles] = useState<
     {
-      left: number | string;
+      left?: number | string;
       position: string;
-      top: number | string;
+      top?: number | string;
     }
-  >({ left: 0, position: 'fixed', top: 0 });
+  >({ position: 'absolute' });
+
   const anchorRef = useRef<HTMLElement>();
   const popupRef = useRef<HTMLElement>();
 
@@ -46,184 +46,159 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
   const rootClass = prefixToUse ? `${prefixToUse}__${positionBaseClass}` : `invx-${positionBaseClass}`;
 
   const updatePopupPosition = (currentPlacement: Position) => {
-    if (anchorRef?.current && popupRef?.current) {
-      const anchorRect = anchorRef.current?.getBoundingClientRect();
-      const popupRect = popupRef.current?.getBoundingClientRect();
+    if (!anchorRef.current || !popupRef.current) return;
 
-      if (!anchorRect || !popupRect) return;
+    const anchorRect = anchorRef.current?.getBoundingClientRect();
+    const popupRect = popupRef.current?.getBoundingClientRect();
 
-      let newStyles = {
-        left: 0,
-        position,
-        top: 0,
+    if (!anchorRect || !popupRect) return;
+
+    let newStyles = {
+      left: 0,
+      position: 'absolute',
+      top: 0,
+    };
+
+    const setPosition = (horizontal: number, vertical: number) => {
+      newStyles = {
+        left: horizontal,
+        position: 'absolute',
+        top: vertical,
       };
+    };
 
-      const setPosition = (horizontal: number, vertical: number) => {
-        newStyles = {
-          left: horizontal,
-          position,
-          top: vertical,
-        };
-      };
+    const offsetParentRect = anchorRef.current.offsetParent?.getBoundingClientRect();
 
-      const offsetParentRect = anchorRef.current.offsetParent?.getBoundingClientRect();
-
-      if (!offsetParentRect) {
-        return;
-      }
-
-      if (position === 'fixed') {
-        switch (currentPlacement) {
-          case 'top':
-            setPosition(
-              anchorRect.left + (anchorRect.width - popupRect.width) / 2,
-              anchorRect.top - popupRect.height,
-            );
-            break;
-          case 'right':
-            setPosition(anchorRect.right, anchorRect.top + (anchorRect.height - popupRect.height) / 2);
-            break;
-          case 'bottom':
-            setPosition(
-              anchorRect.left + (anchorRect.width - popupRect.width) / 2,
-              anchorRect.bottom,
-            );
-            break;
-          case 'left':
-            setPosition(anchorRect.left - popupRect.width, anchorRect.top + (anchorRect.height - popupRect.height) / 2);
-            break;
-          case 'center':
-            setPosition(
-              anchorRect.left + (anchorRect.width - popupRect.width) / 2,
-              anchorRect.top + (anchorRect.height - popupRect.height) / 2,
-            );
-            break;
-          case 'bottom-left':
-            setPosition(anchorRect.left, anchorRect.bottom);
-            break;
-          case 'bottom-right':
-            setPosition(anchorRect.right - popupRect.width, anchorRect.bottom);
-            break;
-          case 'top-left':
-            setPosition(anchorRect.left, anchorRect.top - popupRect.height);
-            break;
-          case 'top-right':
-            setPosition(anchorRect.right - popupRect.width, anchorRect.top - popupRect.height);
-            break;
-          default:
-            break;
-        }
-      } else {
-        const relativeTop = anchorRect.top - offsetParentRect.top;
-        const relativeLeft = anchorRect.left - offsetParentRect.left;
-        const relativeRight = offsetParentRect.right - anchorRect.right;
-
-        switch (currentPlacement) {
-          case 'top':
-            setPosition(
-              relativeLeft + (anchorRect.width - popupRect.width) / 2,
-              relativeTop - popupRect.height,
-            );
-            break;
-          case 'right':
-            setPosition(relativeLeft + anchorRect.width, relativeTop + (anchorRect.height - popupRect.height) / 2);
-            break;
-          case 'bottom':
-            setPosition(
-              relativeLeft + (anchorRect.width - popupRect.width) / 2,
-              relativeTop + anchorRect.height,
-            );
-            break;
-          case 'left':
-            setPosition(relativeLeft - popupRect.width, relativeTop + (anchorRect.height - popupRect.height) / 2);
-            break;
-          case 'center':
-            setPosition(
-              relativeLeft + (anchorRect.width - popupRect.width) / 2,
-              relativeTop + (anchorRect.height - popupRect.height) / 2,
-            );
-            break;
-          case 'bottom-left':
-            setPosition(relativeLeft, relativeTop + anchorRect.height);
-            break;
-          case 'bottom-right':
-            setPosition(relativeRight - popupRect.width, relativeTop + anchorRect.height);
-            break;
-          case 'top-left':
-            setPosition(relativeLeft, relativeTop - popupRect.height);
-            break;
-          case 'top-right':
-            setPosition(relativeRight - popupRect.width, relativeTop - popupRect.height);
-            break;
-          default:
-            break;
-        }
-      }
-
-      setPopupStyles({
-        left: `${newStyles.left}px`,
-        position,
-        top: `${newStyles.top}px`,
-      });
+    if (!offsetParentRect) {
+      return;
     }
+
+    const relativeTop = anchorRect.top - offsetParentRect.top;
+    const relativeLeft = anchorRect.left - offsetParentRect.left;
+    const relativeRight = relativeLeft + anchorRect.width;
+
+    const adjustHorizontalPosition = (horizontal: number) => {
+      if (horizontal + popupRect.width > window.innerWidth) {
+        return window.innerWidth - popupRect.width;
+      }
+      return horizontal;
+    };
+
+    const adjustVerticalPosition = (vertical: number) => {
+      if (vertical + popupRect.height > window.innerHeight) {
+        return window.innerHeight - popupRect.height;
+      }
+      return vertical;
+    };
+
+    switch (currentPlacement) {
+      case 'top':
+        setPosition(
+          adjustHorizontalPosition(relativeLeft + (anchorRect.width - popupRect.width) / 2),
+          adjustVerticalPosition(relativeTop - popupRect.height),
+        );
+        break;
+      case 'right':
+        setPosition(
+          adjustHorizontalPosition(relativeLeft + anchorRect.width),
+          adjustVerticalPosition(relativeTop + (anchorRect.height - popupRect.height) / 2),
+        );
+        break;
+      case 'bottom':
+        setPosition(
+          adjustHorizontalPosition(relativeLeft + (anchorRect.width - popupRect.width) / 2),
+          adjustVerticalPosition(relativeTop + anchorRect.height),
+        );
+        break;
+      case 'left':
+        setPosition(
+          adjustHorizontalPosition(relativeLeft - popupRect.width),
+          adjustVerticalPosition(relativeTop + (anchorRect.height - popupRect.height) / 2),
+        );
+        break;
+      case 'center':
+        setPosition(
+          adjustHorizontalPosition(relativeLeft + (anchorRect.width - popupRect.width) / 2),
+          adjustVerticalPosition(relativeTop + (anchorRect.height - popupRect.height) / 2),
+        );
+        break;
+      case 'bottom-left':
+        setPosition(
+          adjustHorizontalPosition(relativeLeft - popupRect.width),
+          adjustVerticalPosition(relativeTop + anchorRect.height),
+        );
+        break;
+      case 'bottom-right':
+        setPosition(
+          adjustHorizontalPosition(relativeRight),
+          adjustVerticalPosition(relativeTop + anchorRect.height),
+        );
+        break;
+      case 'top-left':
+        setPosition(
+          adjustHorizontalPosition(relativeLeft - popupRect.width),
+          adjustVerticalPosition(relativeTop - popupRect.height),
+        );
+        break;
+      case 'top-right':
+        setPosition(
+          adjustHorizontalPosition(relativeRight),
+          adjustVerticalPosition(relativeTop - popupRect.height),
+        );
+        break;
+      default:
+        break;
+    }
+
+    setPopupStyles({
+      left: `${newStyles.left}px`,
+      position: newStyles.position || 'absolute',
+      top: `${newStyles.top}px`,
+    });
+
+    const updatedPopupRect = popupRef.current.getBoundingClientRect();
+    const updatedPosition = {
+      x: updatedPopupRect.left + newStyles.left,
+      y: updatedPopupRect.top + newStyles.top,
+    };
+
+    if (updatedPosition.x < 0) {
+      newStyles.left = 0;
+    } else if (updatedPosition.x + updatedPopupRect.width > window.innerWidth) {
+      newStyles.left += (window.innerWidth - (updatedPosition.x + updatedPopupRect.width));
+    }
+
+    if (updatedPosition.y < 0) {
+      newStyles.top = 0;
+    } else if (updatedPosition.y + updatedPopupRect.height > window.innerHeight) {
+      newStyles.top += (window.innerHeight - (updatedPosition.y + updatedPopupRect.height));
+    }
+
+    setPopupStyles({
+      left: `${newStyles.left}px`,
+      position: newStyles.position || 'absolute',
+      top: `${newStyles.top}px`,
+    });
   };
+
+  useEffect(() => {
+    updatePopupPosition(placement);
+    window.addEventListener('resize', () => updatePopupPosition(placement));
+    return () => window.removeEventListener('resize', () => updatePopupPosition(placement));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placement]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', () => updatePopupPosition(placement), true);
+    return () => {
+      window.removeEventListener('scroll', () => updatePopupPosition(placement), true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placement]);
 
   const checkCollisions = () => {
-    if (anchorRef?.current && popupRef?.current) {
-      const anchorRect = anchorRef.current?.getBoundingClientRect();
-      const popupRect = popupRef.current?.getBoundingClientRect();
-
-      if (!anchorRect || !popupRect) return;
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-
-      const collidesWithTop = popupRect.top <= 0;
-      const collidesWithRight = popupRect.right >= windowWidth;
-      const collidesWithBottom = popupRect.bottom >= windowHeight;
-      const collidesWithLeft = popupRect.left <= 0;
-
-      if (collidesWithTop) {
-        setPlacement('bottom');
-      } else if (collidesWithRight) {
-        setPlacement('left');
-      } else if (collidesWithBottom) {
-        setPlacement('top');
-      } else if (collidesWithLeft) {
-        setPlacement('right');
-      }
-    }
+    updatePopupPosition(placement);
   };
-
-  const rateLimit = 200;
-
-  const debouncedUpdatePopupPosition = useRef(
-    debounce((newPlacement: Position) => updatePopupPosition(newPlacement), rateLimit),
-  ).current;
-
-  const debouncedCheckCollisions = useRef(
-    debounce(() => checkCollisions(), rateLimit),
-  ).current;
-
-  useEffect(() => {
-    debouncedUpdatePopupPosition(placement);
-    requestAnimationFrame(() => {
-      debouncedCheckCollisions();
-    });
-    debouncedCheckCollisions();
-  }, [debouncedCheckCollisions, debouncedUpdatePopupPosition, placement]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      debouncedUpdatePopupPosition(placement);
-      debouncedCheckCollisions();
-    };
-
-    window.addEventListener('scroll', handleScroll, true);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll, true);
-    };
-  }, [debouncedCheckCollisions, debouncedUpdatePopupPosition, placement]);
 
   const context = {
     checkCollisions,
@@ -240,7 +215,7 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
     <PositionContext.Provider value={context}>
       <div
         style={{
-          position: 'relative',
+          position,
         }}
         {...rest}
       >

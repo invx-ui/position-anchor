@@ -4,6 +4,7 @@ import { Anchor, Position, Popup, PositionAnchor } from '@invx-ui/boilerplate'
 import Draggable from 'react-draggable';
 
 const PositionExample: React.FC = () => {
+  const [placement] = useState<Position>('bottom');
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const positionRef = useRef(position);
   const checkCollisionsRef = useRef<Function>(() => { });
@@ -17,51 +18,113 @@ const PositionExample: React.FC = () => {
     }
   };
 
+  const Component = () => (
+    <PositionAnchor placement={placement}>
+      <Anchor>
+        <div style={{
+          width: '200px',
+          height: '20px',
+        }}>
+          Click Me
+        </div>
+      </Anchor>
+
+      <Popup>
+        <div style={{
+          width: '100px',
+          height: '100px',
+          backgroundColor: 'white',
+          border: '1px solid black',
+        }}>
+          Hover Me
+        </div>
+      </Popup>
+    </PositionAnchor>
+  )
+
   return (
-    <Draggable
-      position={position}
-      onDrag={onControlledDragStop}
-    >
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        height: '100%',
-      }}>
-        <PositionAnchor
-          placement='bottom'
-          position='fixed'
-        >
-          {/* @ts-expect-error */}
-          {({ checkCollisions }) => {
-            checkCollisionsRef.current = checkCollisions;
-            return (
-              <>
-                <Anchor>
-                  <div style={{
-                    width: '200px',
-                    height: '20px',
-                  }}>
-                    Drag Me
-                  </div>
-                </Anchor>
-                <Popup>
-                  <div style={{
-                    width: '100px',
-                    height: '100px',
-                    backgroundColor: 'white',
-                    border: '1px solid black',
-                  }}>
-                    Hover Me
-                  </div>
-                </Popup>
-              </>
-            );
-          }}
-        </PositionAnchor>
+    <>
+      {/* <Draggable
+        position={position}
+        onDrag={onControlledDragStop}
+      >
+        <div>
+          <PositionAnchor
+            placement='bottom'
+          >
+            {
+              ({
+                checkCollisions,
+              }) => {
+                checkCollisionsRef.current = checkCollisions;
+                return (
+                  <>
+                    <Anchor>
+                      <div style={{
+                        width: '200px',
+                        height: '20px',
+                      }}>
+                        Click Me
+                      </div>
+                    </Anchor>
+                    <Popup>
+                      <div style={{
+                        width: '100px',
+                        height: '100px',
+                        backgroundColor: 'white',
+                        border: '1px solid black',
+                      }}>
+                        Hover Me
+                      </div>
+                    </Popup>
+                  </>
+                )
+              }
+            }
+          </PositionAnchor>
+        </div>
+      </Draggable> */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: '100%',
+          width: '100%',
+        }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}>
+          <Component />
+          <Component />
+          <Component />
+        </div>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}>
+          <Component />
+          <Component />
+          <Component />
+        </div>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}>
+          <Component />
+          <Component />
+          <Component />
+        </div>
       </div>
-    </Draggable>
+    </>
+
   )
 }
 
@@ -71,7 +134,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '100vh',
+      height: '100%',
     }}><PositionExample /></div>
   </React.StrictMode>,
 );

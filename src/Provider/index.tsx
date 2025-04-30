@@ -1,5 +1,6 @@
 import React, { HTMLProps, useId, useRef, useState, useEffect } from 'react';
 import { PositionContext } from './context/index.js';
+import { debounce } from '../utils/debounce/index.js';
 
 export const positionBaseClass = 'position';
 
@@ -189,17 +190,21 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
     });
   };
 
+  const debouncedUpdatePopupPosition = useRef(
+    debounce((newPlacement: Position) => updatePopupPosition(newPlacement), 200),
+  ).current;
+
   useEffect(() => {
     updatePopupPosition(placement);
-    window.addEventListener('resize', () => updatePopupPosition(placement));
-    return () => window.removeEventListener('resize', () => updatePopupPosition(placement));
+    window.addEventListener('resize', () => debouncedUpdatePopupPosition(placement));
+    return () => window.removeEventListener('resize', () => debouncedUpdatePopupPosition(placement));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placement]);
 
   useEffect(() => {
-    window.addEventListener('scroll', () => updatePopupPosition(placement), true);
+    window.addEventListener('scroll', () => debouncedUpdatePopupPosition(placement), true);
     return () => {
-      window.removeEventListener('scroll', () => updatePopupPosition(placement), true);
+      window.removeEventListener('scroll', () => debouncedUpdatePopupPosition(placement), true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placement]);

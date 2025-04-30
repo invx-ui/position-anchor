@@ -1,6 +1,6 @@
 {
   "name": "@invx-ui/position-anchor",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "A React component that allows you to anchor a component to another component",
   "repository": "git@github.com:invx-ui/position-anchor.git",
   "author": "Innovixx <contact@innovixx.co.uk>",

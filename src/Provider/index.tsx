@@ -15,6 +15,13 @@ export type PositionSettings = {
   placement: Position;
   position?: 'fixed' | 'relative';
   containerElementId?: string;
+  setPopupStyles?: React.Dispatch<
+    React.SetStateAction<{
+      left?: number | string;
+      position: string;
+      top?: number | string;
+    }>
+  >
 };
 
 export type PositionProviderProps = PositionSettings & HTMLProps<HTMLDivElement> & {
@@ -27,6 +34,7 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
   id: idFromProps,
   placement,
   position = 'relative',
+  setPopupStyles: setPopupStylesFromProps,
   ...rest
 }) => {
   const [popupStyles, setPopupStyles] = useState<
@@ -199,6 +207,10 @@ export const PositionAnchor: React.FC<PositionProviderProps> = ({
   const checkCollisions = () => {
     updatePopupPosition(placement);
   };
+
+  useEffect(() => {
+    setPopupStylesFromProps?.(popupStyles);
+  }, [popupStyles, setPopupStylesFromProps]);
 
   const context = {
     checkCollisions,
